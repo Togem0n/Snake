@@ -21,14 +21,21 @@ public class LList<T>
     {
         head = new Node<T>();
         curr = head;
+        tail = head;
     }
+
+    public Node<T> getHead { get { return head; } }
+    public Node<T> getTail { get { return tail; } }
+    public Node<T> getCurr { get { return curr; } set { curr = value; } }
+
+
 
     public void Push(T value)
     {
         Node<T> newNode = new Node<T>();
         newNode.value = value;
-        curr.next = newNode;
-        newNode.prev = curr;
+        tail.next = newNode;
+        newNode.prev = tail;
         newNode.next = null;
         curr = newNode;
         tail = newNode;
@@ -40,6 +47,7 @@ public class LList<T>
         Node<T> last = tail.prev;
         last.next = null;
         tail = last;
+        count--;
     }
 
     public void Clear()
@@ -47,24 +55,31 @@ public class LList<T>
         head.next = null;
         tail = head;
         curr = head;
+        count = 0;
     }
 
-    public void Print()
+    public void StepThrough()
     {
         //Debug.Log("Head->Tail");
         Node<T> curr = head;
         while(curr.next != null)
         {
             curr = curr.next;
+            Debug.Log(curr.value);
+        }
+    }
+
+    public Node<T> Find(T value)
+    {
+        //Debug.Log("Head->Tail");
+        Node<T> curr = head;
+        while (curr.next != null)
+        {
+            if (object.Equals(curr.value, value)) return curr;
+            curr = curr.next;
             //Debug.Log(curr.value);
         }
-
-        //Debug.Log("Tail->Head");
-        Node<T> tmp = tail;
-        while (tmp.prev != null)
-        {
-            //Debug.Log(tmp.value);
-            tmp = tmp.prev;
-        }
+        if (object.Equals(curr.value, value)) return curr;
+        return null;
     }
 }

@@ -4,16 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Grid : MonoBehaviour
+public class Grid
 {
-    string filename = @"Assets\Scripts\graph.txt";
-    int[,] graph;
-    private void Awake()
-    {
-        ReadFile();
-    }
+    private string filename = @"Assets\Scripts\graph.txt";
+    private int[,] graph;
 
-    private void ReadFile()
+    public int[,] getGraph { get { return graph; } }
+
+    public void ReadFile()
     {
         string text = File.ReadAllText(filename);
         string[] lines = text.Split('\n');
@@ -26,20 +24,19 @@ public class Grid : MonoBehaviour
         int height = lines.Length;
         int width = lines[0].Length;
 
-        graph = new int[width, height];
+        graph = new int[height, width];
 
         Debug.Log(width);
         Debug.Log(height);
         Debug.Log(lines[0][lines[0].Length - 1]);
 
-        for (int i = 0; i < graph.GetLength(0) - 1; i++)
+        for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < graph.GetLength(1); j++)
+            for (int j = 0; j < width - 1; j++)
             {
                 if(!lines[i][j].Equals('\n'))
                 {
                     graph[i, j] = int.Parse(lines[i][j].ToString());
-                    Debug.Log(graph[i, j]);
                 }
             }
         }
