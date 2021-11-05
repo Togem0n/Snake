@@ -82,4 +82,23 @@ public class LList<T>
         if (object.Equals(curr.value, value)) return curr;
         return null;
     }
+
+    public bool Redundant()
+    {
+        Node<T> curr = head.next;
+
+        while (!object.Equals(curr.value, tail.value))
+        {
+            curr = curr.next;
+        }
+
+        if(curr.next != null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 }

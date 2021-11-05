@@ -37,4 +37,5 @@ public class GridGenerator : MonoBehaviour
     {
         graph[i, j] = value;
     }
+
 }

@@ -10,6 +10,8 @@ public class SnakeController : MonoBehaviour
     public LList<Vector3> oldsnake = new LList<Vector3>();
 
     [SerializeField] private GridGenerator gridGenerator;
+    private int[,] graph;
+
     [SerializeField] private GameObject tail;
 
     private float interval;
@@ -31,10 +33,15 @@ public class SnakeController : MonoBehaviour
     private bool canBoost;
     private bool isBoosting;
 
+    private bool isDead;
+    public bool IsDead { get { return isDead; } set { isDead = value; } }
+
     void Start()
     {
         // everytime snake moves, we change the value inside
         // everytime snake eats, we push(instantiate tails) at the end (make it a event)
+        graph = gridGenerator.getGraph;
+
         boxCollider2D = GetComponent<BoxCollider2D>();
 
         foreach (Transform child in transform)
@@ -54,6 +61,8 @@ public class SnakeController : MonoBehaviour
         timeToSpeedUpCounter = timeToSpeedUp;
 
         GameEvents.current.onFruitGotEaten += GrowTail;
+
+        isDead = false;
     }
 
     void Update()
@@ -72,6 +81,14 @@ public class SnakeController : MonoBehaviour
                 //transform.Translate(nextDirection);
                 ChangeSnakeLocation();
             }
+        }
+
+        if (isDead)
+        {
+            // here would be a bug if you run out of the boundry 
+            // causing a null reference
+            Debug.Log("nmsl");
+            Application.Quit();
         }
     }
 
@@ -135,7 +152,10 @@ public class SnakeController : MonoBehaviour
             {
                 gridGenerator.setGraph((int)child.position.x, (int)child.position.y, 0);
                 Vector3 nextPos = child.position + nextDirection;
-                gridGenerator.setGraph((int)nextPos.x, (int)nextPos.y, 2);
+                if (graph[(int)nextPos.x, (int)nextPos.y] == 0)
+                    gridGenerator.setGraph((int)nextPos.x, (int)nextPos.y, 2);
+                else
+                    isDead = true;
                 child.Translate(nextDirection);
             }
         }
