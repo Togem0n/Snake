@@ -26,10 +26,6 @@ public class Grid
 
         graph = new int[height, width];
 
-        Debug.Log(width);
-        Debug.Log(height);
-        Debug.Log(lines[0][lines[0].Length - 1]);
-
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width - 1; j++)

@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class SnakeController : MonoBehaviour
 {
-    LList<Vector3> snake = new LList<Vector3>();
-    LList<Vector3> oldsnake = new LList<Vector3>();
+    private BoxCollider2D boxCollider2D;
+
+    public LList<Vector3> snake = new LList<Vector3>();
+    public LList<Vector3> oldsnake = new LList<Vector3>();
+
+    [SerializeField] private GridGenerator gridGenerator;
+    [SerializeField] private GameObject tail;
 
     private float interval;
     [SerializeField] float generalInterval;
@@ -13,6 +18,9 @@ public class SnakeController : MonoBehaviour
     [SerializeField] float boostlInterval;
 
     private bool gameStart;
+
+    public bool GameStarted { get { return gameStart; } }
+
     private int horizontal;
     private int vertical;
     private Vector3 nextDirection;
@@ -26,12 +34,14 @@ public class SnakeController : MonoBehaviour
     void Start()
     {
         // everytime snake moves, we change the value inside
-        // everytime snake eats, we push(instantiate tails) at the end
+        // everytime snake eats, we push(instantiate tails) at the end (make it a event)
+        boxCollider2D = GetComponent<BoxCollider2D>();
 
         foreach (Transform child in transform)
         {
             snake.Push(new Vector3(child.position.x, child.position.y, 0));
             oldsnake.Push(new Vector3(child.position.x, child.position.y, 0));
+            gridGenerator.setGraph((int)child.position.x, (int)child.position.y, 2);
         }
 
         generalInterval = normalInterval;
@@ -42,6 +52,8 @@ public class SnakeController : MonoBehaviour
 
         timeToSpeedUp = 0.1f;
         timeToSpeedUpCounter = timeToSpeedUp;
+
+        GameEvents.current.onFruitGotEaten += GrowTail;
     }
 
     void Update()
@@ -121,6 +133,9 @@ public class SnakeController : MonoBehaviour
         {
             if (child.position == snake.getCurr.value)
             {
+                gridGenerator.setGraph((int)child.position.x, (int)child.position.y, 0);
+                Vector3 nextPos = child.position + nextDirection;
+                gridGenerator.setGraph((int)nextPos.x, (int)nextPos.y, 2);
                 child.Translate(nextDirection);
             }
         }
@@ -136,6 +151,9 @@ public class SnakeController : MonoBehaviour
                 Vector3 tmp = oldsnake.getCurr.prev.value - oldsnake.getCurr.value;
                 if (child.position == snake.getCurr.value)
                 {
+                    gridGenerator.setGraph((int)child.position.x, (int)child.position.y, 0);
+                    Vector3 nextPos = child.position + tmp;
+                    gridGenerator.setGraph((int)nextPos.x, (int)nextPos.y, 2);
                     child.Translate(tmp);
                 }
             }
@@ -155,4 +173,17 @@ public class SnakeController : MonoBehaviour
 
         //snake.StepThrough();
     }
+
+    private void GrowTail()
+    {
+        Debug.Log(snake.getTail.value);
+        Debug.Log(snake.getTail.prev.value);
+        Vector3 growDirection = snake.getTail.value - snake.getTail.prev.value;
+        Vector3 growPosition = snake.getTail.value + growDirection;
+        snake.Push(growPosition);
+        oldsnake.Push(growPosition);
+        gridGenerator.setGraph((int)growPosition.x, (int)growPosition.y, 2);
+        Instantiate(tail, growPosition, Quaternion.identity, transform);
+    }
+
 }

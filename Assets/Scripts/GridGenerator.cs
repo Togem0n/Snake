@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
-
     private Grid grid = new Grid();
     private int[,] graph;
+
+    public int[,] getGraph { get { return graph; } set { graph = value; } }
 
     [SerializeField] private GameObject road;
     [SerializeField] private GameObject wall;
 
-    void Start()
+    void Awake()
     {
         grid.ReadFile();
         graph = grid.getGraph;
@@ -30,5 +31,10 @@ public class GridGenerator : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void setGraph(int i, int j, int value)
+    {
+        graph[i, j] = value;
     }
 }
