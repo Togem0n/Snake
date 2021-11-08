@@ -196,8 +196,6 @@ public class SnakeController : MonoBehaviour
 
     private void GrowTail()
     {
-        Debug.Log(snake.getTail.value);
-        Debug.Log(snake.getTail.prev.value);
         Vector3 growDirection = snake.getTail.value - snake.getTail.prev.value;
         Vector3 growPosition = snake.getTail.value + growDirection;
         snake.Push(growPosition);

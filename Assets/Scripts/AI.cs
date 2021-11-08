@@ -6,6 +6,11 @@ using UnityEngine;
 public class AI : MonoBehaviour
 {
     [SerializeField] private GridGenerator gridGenerator;
+    [SerializeField] private float AIInterval;
+    [SerializeField] private GameObject tail;
+
+    [SerializeField] private SnakeController snakeController;
+    private float interval;
     private int[,] AIgraph;
     private int offset;
 
@@ -17,13 +22,18 @@ public class AI : MonoBehaviour
     {
         AIgraph = gridGenerator.getAIGraph;
         offset = 51;
-
+        interval = AIInterval;
         foreach (Transform child in transform)
         {
-            AIsnake.Add(new Vector3(child.position.x - offset, child.position.y, 0));
+            AIsnake.Add(new Vector3(child.position.x, child.position.y, 0));
 
             gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
         }
+
+        GameEvents.current.onFruitGotEaten += GrowTail;
+        GameEvents.current.onFruitGotEaten += combineTest;
+
+        Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
 
     // Update is called once per frame
@@ -31,16 +41,40 @@ public class AI : MonoBehaviour
     {
         // run astar when game start
         // then everytime instantiate a fruit (so that is everytime a fruit got eaten), run Astar, 
-        if(count == 0)
+/*        if(count == 0)
         {
-            //Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
+            Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
             count++;
+        }*/
+
+        if (snakeController.GameStarted)
+        {
+            if (shortestPath.Count != 0)
+            {
+                if (interval > 0)
+                {
+                    interval -= Time.deltaTime;
+                }
+                else
+                {
+                    interval = AIInterval;
+                    ChangePosition();
+                }
+            }
+           
         }
-        //Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
+    }
+
+    private void combineTest()
+    {
+        Debug.Log("???");
+        Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
 
     private void SyncPosition()
     {
+        Debug.Log(GameObject.FindWithTag("AIFruit").transform.position);
+
         for (int i = 0; i < AIgraph.GetLength(0); i++)
         {
             for (int j = 0; j < AIgraph.GetLength(1) - 1; j++)
@@ -55,8 +89,45 @@ public class AI : MonoBehaviour
         }
     }
 
+    private void ChangePosition()
+    {
+        /*Vector3 des = shortestPath[shortestPath.Count - 1];
+                    des.x += offset;
+                    shortestPath.RemoveAt(shortestPath.Count - 1);
+                    Vector3 nextDirection = des - transform.position;*/
+        for (int i = AIsnake.Count - 1; i >= 0; i--)
+        {
+            foreach (Transform child in transform)
+            {
+
+                if (child.position == AIsnake[i])
+                {
+
+                    if (i == 0)
+                    {
+                        Vector3 des = shortestPath[shortestPath.Count - 1];
+                        des.x += offset;
+                        shortestPath.RemoveAt(shortestPath.Count - 1);
+                        Vector3 nextDirection = des - AIsnake[i];
+                        AIsnake[i] += nextDirection;
+                        child.Translate(nextDirection);
+                    }
+                    else
+                    {
+                        child.Translate(AIsnake[i - 1] - AIsnake[i]);
+                        AIsnake[i] = AIsnake[i - 1];
+                    }
+
+
+                }
+            }
+
+        }
+    }
+
     private Dictionary<Vector3, Vector3> Astar(Vector3 start, Vector3 end)
     {
+        SyncPosition();
         shortestPath.Clear();
         AIgraph = gridGenerator.getAIGraph;
 
@@ -86,14 +157,13 @@ public class AI : MonoBehaviour
 
         openList.Add(start);
 
-
         while (openList.Count != 0)
         {
             float min = Mathf.Infinity;
             Vector3 current = new Vector3();
             foreach(var ele in openList)
             {
-                if (min < f[ele])
+                if (min >= f[ele])
                 {
                     min = f[ele];
                     current = ele;
@@ -104,10 +174,12 @@ public class AI : MonoBehaviour
             if (current == end)
             {
                 Vector3 tmp = current;
+                int shortestDis = 0;
                 while (parent.ContainsKey(tmp))
                 {
-                    Debug.Log(tmp);
-                    tmp = parent[tmp];
+                    shortestPath.Add(tmp);
+                    tmp = parent[tmp]; 
+                    shortestDis++;
                 }
                 return parent;
             }
@@ -116,13 +188,14 @@ public class AI : MonoBehaviour
             closeList.Add(current);
 
             //up
-            Vector3 currentUp = current;
-            currentUp.y += 1;
+            Vector3 currentUp = new Vector3();
+            currentUp.x = current.x;
+            currentUp.y = current.y + 1;
+            currentUp.z = current.z;
             
-            if(currentUp.x >=0 && currentUp.x <= 51 && currentUp.y >= 0 && currentUp.y <= 51)
+            if(currentUp.x >=0 && currentUp.x < AIgraph.GetLength(0) && currentUp.y >= 0 && currentUp.y < AIgraph.GetLength(1) - 1 && AIgraph[(int)currentUp.x, (int)currentUp.y] == 0)
             {
-                if (!closeList.Contains(currentUp))
-                {
+                if (!closeList.Contains(currentUp)){
                     float tmp = g[current] + 1;
                     if (!openList.Contains(currentUp))
                     {
@@ -141,10 +214,12 @@ public class AI : MonoBehaviour
             }
 
             //Down
-            Vector3 currentDown = current;
-            currentDown.y -= 1;
+            Vector3 currentDown = new Vector3();
+            currentDown.x = current.x;
+            currentDown.y = current.y - 1;
+            currentDown.z = current.z;
 
-            if (currentDown.x >= 0 && currentDown.x <= 51 && currentDown.y >= 0 && currentDown.y <= 51)
+            if (currentDown.x >= 0 && currentDown.x < AIgraph.GetLength(0) && currentDown.y >= 0 && currentDown.y < AIgraph.GetLength(1) - 1 && AIgraph[(int)currentDown.x, (int)currentDown.y] == 0)
             {
                 if (!closeList.Contains(currentDown))
                 {
@@ -166,10 +241,12 @@ public class AI : MonoBehaviour
             }
 
             //Left
-            Vector3 currentLeft = current;
-            currentLeft.x -= 1;
+            Vector3 currentLeft = new Vector3();
+            currentLeft.x = current.x - 1;
+            currentLeft.y = current.y;
+            currentLeft.z = current.z;
 
-            if (currentLeft.x >= 0 && currentLeft.x <= 51 && currentLeft.y >= 0 && currentLeft.y <= 51)
+            if (currentLeft.x >= 0 && currentLeft.x < AIgraph.GetLength(0) && currentLeft.y >= 0 && currentLeft.y < AIgraph.GetLength(1) - 1 && AIgraph[(int)currentLeft.x, (int)currentLeft.y] == 0)
             {
                 if (!closeList.Contains(currentLeft))
                 {
@@ -191,10 +268,12 @@ public class AI : MonoBehaviour
             }
 
             //Right
-            Vector3 currentRight = current;
-            currentRight.x += 1;
+            Vector3 currentRight = new Vector3();
+            currentRight.x = current.x + 1;
+            currentRight.y = current.y;
+            currentRight.z = current.z;
 
-            if (currentRight.x >= 0 && currentRight.x <= 51 && currentRight.y >= 0 && currentRight.y <= 51)
+            if (currentRight.x >= 0 && currentRight.x < AIgraph.GetLength(0) && currentRight.y >= 0 && currentRight.y < AIgraph.GetLength(1) - 1 && AIgraph[(int)currentRight.x, (int)currentRight.y] == 0)
             {
                 if (!closeList.Contains(currentRight))
                 {
@@ -216,7 +295,17 @@ public class AI : MonoBehaviour
             }
         }
 
-        Debug.Log(start.ToString() + ";" + end.ToString());
+        //Debug.Log(start.ToString() + ";" + end.ToString());
         return parent;
+    }
+
+    private void GrowTail()
+    {
+
+        Vector3 growDirection = AIsnake[AIsnake.Count - 1] - AIsnake[AIsnake.Count - 2];
+        Vector3 growPosition = AIsnake[AIsnake.Count - 1] + growDirection;
+        AIsnake.Add(growPosition);
+        gridGenerator.setAIGraph((int)growPosition.x - offset, (int)growPosition.y, 2);
+        Instantiate(tail, growPosition, Quaternion.identity, transform);
     }
 }
