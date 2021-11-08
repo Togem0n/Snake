@@ -31,7 +31,6 @@ public class AI : MonoBehaviour
         }
 
         GameEvents.current.onFruitGotEaten += GrowTail;
-        GameEvents.current.onFruitGotEaten += combineTest;
 
         Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
@@ -39,14 +38,6 @@ public class AI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // run astar when game start
-        // then everytime instantiate a fruit (so that is everytime a fruit got eaten), run Astar, 
-/*        if(count == 0)
-        {
-            Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
-            count++;
-        }*/
-
         if (snakeController.GameStarted)
         {
             if (shortestPath.Count != 0)
@@ -61,7 +52,6 @@ public class AI : MonoBehaviour
                     ChangePosition();
                 }
             }
-           
         }
     }
 

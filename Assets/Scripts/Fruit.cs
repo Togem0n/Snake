@@ -29,6 +29,7 @@ public class Fruit : MonoBehaviour
 
     private void DestoryMyself()
     {
+        Debug.Log("2?");
         GameEvents.current.onFruitGotEaten -= DestoryMyself;
         Destroy(transform.gameObject);
     }
