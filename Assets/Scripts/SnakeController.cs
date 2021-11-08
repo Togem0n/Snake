@@ -88,7 +88,7 @@ public class SnakeController : MonoBehaviour
             // here would be a bug if you run out of the boundry 
             // causing a null reference
             Debug.Log("nmsl");
-            Application.Quit();
+            Time.timeScale = 0;
         }
     }
 

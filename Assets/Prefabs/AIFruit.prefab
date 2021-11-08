@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 8704226171827487989}
   - component: {fileID: 5998258026593233364}
   m_Layer: 0
-  m_Name: Fruit
-  m_TagString: Fruit
+  m_Name: AIFruit
+  m_TagString: AIFruit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
