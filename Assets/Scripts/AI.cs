@@ -17,6 +17,10 @@ public class AI : MonoBehaviour
     private List<Vector3> AIsnake = new List<Vector3>();
     private List<Vector3> shortestPath = new List<Vector3>();
 
+    private bool isNewFruit;
+
+    public bool IsNewFruit { get { return isNewFruit; } set { isNewFruit = value; } }
+
     int count = 0;
     void Start()
     {
@@ -52,6 +56,14 @@ public class AI : MonoBehaviour
                     ChangePosition();
                 }
             }
+        }
+        // if new fruit:
+        // astar(xxxxxx);
+
+        if (isNewFruit)
+        {
+            isNewFruit = false;
+            Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
         }
     }
 
@@ -119,6 +131,7 @@ public class AI : MonoBehaviour
     {
         SyncPosition();
         shortestPath.Clear();
+
         AIgraph = gridGenerator.getAIGraph;
 
         start.x -= offset;

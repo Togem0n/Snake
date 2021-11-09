@@ -8,6 +8,8 @@ public class FruitGenerator : MonoBehaviour
     [SerializeField] private GameObject fruit;
     [SerializeField] private GameObject AIfruit;
 
+    [SerializeField] private AI ai;
+
     private int[,] graph;
     private int[,] AIgraph;
     private List<Vector3> availablePosition = new List<Vector3>();
@@ -52,5 +54,7 @@ public class FruitGenerator : MonoBehaviour
         int num = Random.Range(0, count);
         Instantiate(fruit, availablePosition[num], Quaternion.identity);
         Instantiate(AIfruit, new Vector3(availablePosition[num].x + 51, availablePosition[num].y, 0), Quaternion.identity);
+
+        ai.IsNewFruit = true;
     }
 }

@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridGenerator: {fileID: 1715440175}
-  AIInterval: 0.07
+  AIInterval: 0.015
   tail: {fileID: 5678174793261361363, guid: 1e72502eba1f5154ab1692c4d28abac9, type: 3}
   snakeController: {fileID: 1975237615}
 --- !u!4 &122535162
@@ -541,6 +541,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 236025172098896910, guid: 0d8942f99e491c0488c740d389dfa979, type: 3}
+      propertyPath: ai
+      value: 
+      objectReference: {fileID: 122535161}
     - target: {fileID: 236025172098896910, guid: 0d8942f99e491c0488c740d389dfa979, type: 3}
       propertyPath: AIfruit
       value: 
