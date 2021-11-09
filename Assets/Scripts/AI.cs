@@ -23,7 +23,7 @@ public class AI : MonoBehaviour
 
 
     private List<Vector3> shortestPath = new List<Vector3>();
-
+    private int shortestDis;
     private bool isNewFruit;
 
     public bool IsNewFruit { get { return isNewFruit; } set { isNewFruit = value; } }
@@ -41,11 +41,13 @@ public class AI : MonoBehaviour
         interval = AIInterval;
         foreach (Transform child in transform)
         {
-            AIsnake.Add(new Vector3(child.position.x, child.position.y, 0));
-            OldAIsnake.Add(new Vector3(child.position.x, child.position.y, 0));
+            AIsnake.Add(new Vector3((int)child.position.x, (int)child.position.y, 0));
+            OldAIsnake.Add(new Vector3Int((int)child.position.x, (int)child.position.y, 0));
 
             gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
         }
+
+        GameEvents.current.onFruitGotEaten += GrowTail;
 
         Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
@@ -63,21 +65,18 @@ public class AI : MonoBehaviour
                 }
                 else
                 {
+                    //Debug.Log(shortestPath.Count);
                     interval = AIInterval;
                     ChangePosition();
+                    Debug.Log(shortestPath.Count);
                 }
             }
         }
 
-        Debug.Log(AIsnake.Count);
-
-    }
-    private void LateUpdate()
-    {
         if (isNewFruit)
         {
-            
-            if(nextSearchCounter > 0)
+
+            if (nextSearchCounter > 0)
             {
                 nextSearchCounter -= Time.deltaTime;
             }
@@ -86,10 +85,15 @@ public class AI : MonoBehaviour
                 Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
                 isNewFruit = false;
                 nextSearchCounter = nextSearchTime;
+                Debug.Log(shortestDis);
             }
         }
-    }
 
+    }
+    private void LateUpdate()
+    {
+
+    }
 
     private void SyncPosition()
     {
@@ -125,37 +129,53 @@ public class AI : MonoBehaviour
                 des.x += offset;
                 shortestPath.RemoveAt(shortestPath.Count - 1);
                 Vector3 nextDirection = des - AIsnake[0];
-                nextDirection.Normalize();
 
-                gridGenerator.setAIGraph((int)AIsnake[0].x - offset, (int)AIsnake[0].y, 0);
-                child.Translate(nextDirection);
+                gridGenerator.setAIGraph((int)(AIsnake[0].x - offset), (int)AIsnake[0].y, 0);
 
-                
-                AIsnake[0] += nextDirection;
+                nextDirection.x = (int)nextDirection.x;
+                nextDirection.y = (int)nextDirection.y;
+                nextDirection.z = (int)nextDirection.z;
+                //child.Translate(nextDirection);
+                child.position = child.position + nextDirection;
 
-                gridGenerator.setAIGraph((int)AIsnake[0].x - offset, (int)AIsnake[0].y, 2);
+                des.x = (int)des.x;
+                des.y = (int)des.y;
+                des.z = (int)des.z;
+
+                AIsnake[0] = des;
+
+                gridGenerator.setAIGraph((int)(AIsnake[0].x - offset), (int)AIsnake[0].y, 2);
             }
             //問題是 迭代時不保證順序的其實
             for(int i = 1; i < AIsnake.Count; i++)
             {
                 if(child.position == OldAIsnake[i])
                 {
-                    gridGenerator.setAIGraph((int)OldAIsnake[i].x - offset, (int)OldAIsnake[i].y, 0);
-                    child.Translate(OldAIsnake[i - 1] - OldAIsnake[i]);
+                    gridGenerator.setAIGraph((int)(OldAIsnake[i].x - offset), (int)OldAIsnake[i].y, 0);
+
+                    Vector3 nextDirection = OldAIsnake[i - 1] - OldAIsnake[i];
+                    nextDirection.x = (int)nextDirection.x;
+                    nextDirection.y = (int)nextDirection.y;
+                    nextDirection.z = (int)nextDirection.z;
+                    //child.Translate(nextDirection);
+
+                    child.position = child.position + nextDirection;
+                        
                     AIsnake[i] = OldAIsnake[i - 1];
-                    gridGenerator.setAIGraph((int)OldAIsnake[i - 1].x - offset, (int)OldAIsnake[i - 1].y, 2);
+
+                    gridGenerator.setAIGraph((int)(OldAIsnake[i - 1].x - offset), (int)OldAIsnake[i - 1].y, 2);
                 }
             }
         }
 
-        for(int i = 0; i < AIsnake.Count; i++)
+        for (int i = 0; i < AIsnake.Count; i++)
         {
             OldAIsnake[i] = AIsnake[i];
         }
 
         if(shortestPath.Count == 0)
         {
-            GrowTail();
+            //GrowTail();
         }
 
         //SyncPosition();
@@ -163,8 +183,9 @@ public class AI : MonoBehaviour
 
     private Dictionary<Vector3, Vector3> Astar(Vector3 start, Vector3 end)
     {
-        //SyncPosition();
         shortestPath.Clear();
+        Debug.Log(isNewFruit);
+        Debug.Log(shortestPath.Count);
 
         AIgraph = gridGenerator.getAIGraph;
 
@@ -218,12 +239,18 @@ public class AI : MonoBehaviour
             if (current == end)
             {
                 Vector3 tmp = current;
-                int shortestDis = 0;
+                shortestDis = 0;
                 while (parent.ContainsKey(tmp))
                 {
                     shortestPath.Add(tmp);
                     tmp = parent[tmp]; 
                     shortestDis++;
+                }
+
+                Debug.Log("----------------------------------------------------------------");
+                foreach(var ele in shortestPath)
+                {
+                    Debug.Log(ele);
                 }
      
                 return parent;
@@ -349,6 +376,12 @@ public class AI : MonoBehaviour
 
         Vector3 growDirection = AIsnake[AIsnake.Count - 1] - AIsnake[AIsnake.Count - 2];
         Vector3 growPosition = AIsnake[AIsnake.Count - 1] + growDirection;
+
+        growPosition.x = (int)growPosition.x;
+        growPosition.y = (int)growPosition.y;
+        growPosition.z = (int)growPosition.z;
+
+
         AIsnake.Add(growPosition);
         OldAIsnake.Add(growPosition);
         Debug.Log(growDirection);
