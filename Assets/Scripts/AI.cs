@@ -14,8 +14,12 @@ public class AI : MonoBehaviour
     private int[,] AIgraph;
     private int offset;
 
+    public int[,] getAIgraph { get { return AIgraph; } }
+
     private List<Vector3> AIsnake = new List<Vector3>();
     private List<Vector3> OldAIsnake = new List<Vector3>();
+
+    public List<Vector3> getAIsnake { get { return AIsnake; } }
 
 
     private List<Vector3> shortestPath = new List<Vector3>();
@@ -23,6 +27,9 @@ public class AI : MonoBehaviour
     private bool isNewFruit;
 
     public bool IsNewFruit { get { return isNewFruit; } set { isNewFruit = value; } }
+
+    private float nextSearchTime = 0.05f;
+    private float nextSearchCounter = 0.05f;
 
    // [SerializeField] private TMPro text;
 
@@ -39,8 +46,6 @@ public class AI : MonoBehaviour
 
             gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
         }
-
-        GameEvents.current.onFruitGotEaten += GrowTail;
 
         Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
@@ -63,16 +68,26 @@ public class AI : MonoBehaviour
                 }
             }
         }
-        // if new fruit:
-        // astar(xxxxxx);
-        
+
+        Debug.Log(AIsnake.Count);
+
+    }
+    private void LateUpdate()
+    {
         if (isNewFruit)
         {
-            isNewFruit = false;
-            Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
+            
+            if(nextSearchCounter > 0)
+            {
+                nextSearchCounter -= Time.deltaTime;
+            }
+            else
+            {
+                Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
+                isNewFruit = false;
+                nextSearchCounter = nextSearchTime;
+            }
         }
-
-        SyncPosition();
     }
 
 
@@ -84,62 +99,63 @@ public class AI : MonoBehaviour
         {
             for (int j = 0; j < AIgraph.GetLength(1) - 1; j++)
             {
-                //if (AIgraph[i, j] == 2) gridGenerator.setAIGraph(i, j, 0);
-                if(AIgraph[i, j] == 2)
+                if (AIgraph[i, j] == 2)
                 {
+                    gridGenerator.setAIGraph(i, j, 0);
                     cnt++;
                 }
             }
         }
         Debug.Log(cnt);
-        /*foreach (Transform child in transform)
+
+        foreach (Transform child in transform)
         {
             gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
-        }*/
+        }
     }
 
     private void ChangePosition()
     {
-        /*Vector3 des = shortestPath[shortestPath.Count - 1];
-                    des.x += offset;
-                    shortestPath.RemoveAt(shortestPath.Count - 1);
-                    Vector3 nextDirection = des - transform.position;*/
-        for (int i = 0; i < AIsnake.Count; i++)
+        
+        foreach (Transform child in transform)
         {
-            foreach (Transform child in transform)
+            if(child.position == OldAIsnake[0])
             {
+                Vector3 des = shortestPath[shortestPath.Count - 1];
+                des.x += offset;
+                shortestPath.RemoveAt(shortestPath.Count - 1);
+                Vector3 nextDirection = des - AIsnake[0];
+                nextDirection.Normalize();
 
-                if (child.position == AIsnake[i])
+                gridGenerator.setAIGraph((int)AIsnake[0].x - offset, (int)AIsnake[0].y, 0);
+                child.Translate(nextDirection);
+
+                
+                AIsnake[0] += nextDirection;
+
+                gridGenerator.setAIGraph((int)AIsnake[0].x - offset, (int)AIsnake[0].y, 2);
+            }
+            //問題是 迭代時不保證順序的其實
+            for(int i = 1; i < AIsnake.Count; i++)
+            {
+                if(child.position == OldAIsnake[i])
                 {
-
-                    if (i == 0)
-                    {
-                        Vector3 des = shortestPath[shortestPath.Count - 1];
-                        des.x += offset;
-                        shortestPath.RemoveAt(shortestPath.Count - 1);
-                        Vector3 nextDirection = des - AIsnake[i];
-
-                        gridGenerator.setAIGraph((int)AIsnake[i].x - offset, (int)AIsnake[i].y, 0);
-                        AIsnake[i] += nextDirection;
-                        gridGenerator.setAIGraph((int)AIsnake[i].x - offset, (int)AIsnake[i].y, 2);
-                        child.Translate(nextDirection);
-                    }
-                    else
-                    {
-                        gridGenerator.setAIGraph((int)AIsnake[i].x - offset, (int)AIsnake[i].y, 0);
-                        child.Translate(OldAIsnake[i - 1] - OldAIsnake[i]);
-                        AIsnake[i] = OldAIsnake[i - 1];
-                        gridGenerator.setAIGraph((int)OldAIsnake[i-1].x - offset, (int)OldAIsnake[i-1].y, 2);
-                    }
-
+                    gridGenerator.setAIGraph((int)OldAIsnake[i].x - offset, (int)OldAIsnake[i].y, 0);
+                    child.Translate(OldAIsnake[i - 1] - OldAIsnake[i]);
+                    AIsnake[i] = OldAIsnake[i - 1];
+                    gridGenerator.setAIGraph((int)OldAIsnake[i - 1].x - offset, (int)OldAIsnake[i - 1].y, 2);
                 }
             }
         }
 
-
         for(int i = 0; i < AIsnake.Count; i++)
         {
             OldAIsnake[i] = AIsnake[i];
+        }
+
+        if(shortestPath.Count == 0)
+        {
+            GrowTail();
         }
 
         //SyncPosition();
@@ -162,6 +178,13 @@ public class AI : MonoBehaviour
         Dictionary<Vector3, float> g = new Dictionary<Vector3, float>();
         Dictionary<Vector3, float> h = new Dictionary<Vector3, float>();
         Dictionary<Vector3, float> f = new Dictionary<Vector3, float>();
+
+        openList.Clear();
+        closeList.Clear();
+        parent.Clear();
+        g.Clear();
+        h.Clear();
+        f.Clear();
 
         for (int i = 0; i < AIgraph.GetLength(0); i++)
         {
@@ -202,6 +225,7 @@ public class AI : MonoBehaviour
                     tmp = parent[tmp]; 
                     shortestDis++;
                 }
+     
                 return parent;
             }
 
@@ -327,6 +351,8 @@ public class AI : MonoBehaviour
         Vector3 growPosition = AIsnake[AIsnake.Count - 1] + growDirection;
         AIsnake.Add(growPosition);
         OldAIsnake.Add(growPosition);
+        Debug.Log(growDirection);
+        Debug.Log(growPosition);
         gridGenerator.setAIGraph((int)growPosition.x - offset, (int)growPosition.y, 2);
         Instantiate(tail, growPosition, Quaternion.identity, transform);
     }
