@@ -16,7 +16,7 @@ public class Fruit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (lifeTime > 0)
+        /*if (lifeTime > 0)
         {
             lifeTime -= Time.deltaTime;
         }
@@ -24,12 +24,11 @@ public class Fruit : MonoBehaviour
         {
             //fruitGenerator.GenerateFruit();
             Destroy(gameObject);
-        }
+        }*/
     }
 
     private void DestoryMyself()
     {
-        Debug.Log("2?");
         GameEvents.current.onFruitGotEaten -= DestoryMyself;
         Destroy(transform.gameObject);
     }

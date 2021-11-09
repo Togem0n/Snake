@@ -24,7 +24,7 @@ public class GridGenerator : MonoBehaviour
         grid.ReadFile();
         graph = grid.getGraph;
 
-        AIgraph = grid.getGraph;
+        AIgraph = grid.getAIGraph;
 
         for (int i = 0; i < graph.GetLength(0); i++)
         {

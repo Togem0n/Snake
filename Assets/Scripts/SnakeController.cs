@@ -34,7 +34,7 @@ public class SnakeController : MonoBehaviour
     private bool isBoosting;
 
     private bool isDead;
-    public bool IsDead { get { return isDead; } set { isDead = value; } }
+    //public bool IsDead { get { return isDead; } set { isDead = value; } }
 
     void Start()
     {

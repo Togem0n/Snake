@@ -8,8 +8,12 @@ public class Grid
 {
     private string filename = @"Assets\Scripts\graph.txt";
     private int[,] graph;
+    private int[,] AIgraph;
+
 
     public int[,] getGraph { get { return graph; } }
+    public int[,] getAIGraph { get { return AIgraph; } }
+
 
     public void ReadFile()
     {
@@ -25,6 +29,8 @@ public class Grid
         int width = lines[0].Length;
 
         graph = new int[height, width];
+        AIgraph = new int[height, width];
+
 
         for (int i = 0; i < height; i++)
         {
@@ -33,6 +39,8 @@ public class Grid
                 if(!lines[i][j].Equals('\n'))
                 {
                     graph[i, j] = int.Parse(lines[i][j].ToString());
+                    AIgraph[i, j] = int.Parse(lines[i][j].ToString());
+
                 }
             }
         }
