@@ -86,7 +86,6 @@ public class AI : MonoBehaviour
                 nextSearchCounter = nextSearchTime;
             }
         }
-
     }
     private void LateUpdate()
     {
@@ -188,8 +187,17 @@ public class AI : MonoBehaviour
     private Dictionary<Vector3, Vector3> Astar(Vector3 start, Vector3 end)
     {
         shortestPath.Clear();
-        Debug.Log(isNewFruit);
-        Debug.Log(shortestPath.Count);
+        /*        Debug.Log(isNewFruit);
+                Debug.Log(shortestPath.Count);*/
+
+        start.x = (int)start.x;
+        start.y = (int)start.y;
+        start.z = (int)start.z;
+
+
+        end.x = (int)end.x;
+        end.y = (int)end.y;
+        end.z = (int)end.z;
 
         AIgraph = gridGenerator.getAIGraph;
 
@@ -251,11 +259,11 @@ public class AI : MonoBehaviour
                     shortestDis++;
                 }
 
-                Debug.Log("----------------------------------------------------------------");
+/*                Debug.Log("----------------------------------------------------------------");
                 foreach(var ele in shortestPath)
                 {
                     //Debug.Log(ele);
-                }
+                }*/
      
                 return parent;
             }

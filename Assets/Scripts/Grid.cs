@@ -32,14 +32,14 @@ public class Grid
         AIgraph = new int[height, width];
 
 
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < width - 1; i++)
         {
-            for (int j = 0; j < width - 1; j++)
+            for (int j = 0; j < height; j++)
             {
                 if(!lines[i][j].Equals('\n'))
                 {
-                    graph[i, j] = int.Parse(lines[i][j].ToString());
-                    AIgraph[i, j] = int.Parse(lines[i][j].ToString());
+                    graph[j, i] = int.Parse(lines[i][j].ToString());
+                    AIgraph[j, i] = int.Parse(lines[i][j].ToString());
 
                 }
             }
