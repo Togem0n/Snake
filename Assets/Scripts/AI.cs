@@ -68,7 +68,6 @@ public class AI : MonoBehaviour
                     //Debug.Log(shortestPath.Count);
                     interval = AIInterval;
                     ChangePosition();
-                    Debug.Log(shortestPath.Count);
                 }
             }
         }
@@ -85,7 +84,6 @@ public class AI : MonoBehaviour
                 Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
                 isNewFruit = false;
                 nextSearchCounter = nextSearchTime;
-                Debug.Log(shortestDis);
             }
         }
 
@@ -123,10 +121,14 @@ public class AI : MonoBehaviour
         
         foreach (Transform child in transform)
         {
-            if(child.position == OldAIsnake[0])
+            //if((int)child.position.x == (int)OldAIsnake[0].x && (int)child.position.y == (int)OldAIsnake[0].y)
+            if(Mathf.Abs(child.position.x - OldAIsnake[0].x) < 0.001 && Mathf.Abs(child.position.y - OldAIsnake[0].y) < 0.001)
+            //if(child.position == OldAIsnake[0])
             {
+                Debug.Log(OldAIsnake[0] + child.name); 
                 Vector3 des = shortestPath[shortestPath.Count - 1];
-                des.x += offset;
+                des.x = (int)des.x + offset;
+                des.y = (int)des.y;
                 shortestPath.RemoveAt(shortestPath.Count - 1);
                 Vector3 nextDirection = des - AIsnake[0];
 
@@ -135,9 +137,9 @@ public class AI : MonoBehaviour
                 nextDirection.x = (int)nextDirection.x;
                 nextDirection.y = (int)nextDirection.y;
                 nextDirection.z = (int)nextDirection.z;
-                //child.Translate(nextDirection);
-                child.position = child.position + nextDirection;
 
+                child.Translate(nextDirection.normalized);
+                //child.position = child.position + nextDirection;
                 des.x = (int)des.x;
                 des.y = (int)des.y;
                 des.z = (int)des.z;
@@ -149,18 +151,20 @@ public class AI : MonoBehaviour
             //問題是 迭代時不保證順序的其實
             for(int i = 1; i < AIsnake.Count; i++)
             {
-                if(child.position == OldAIsnake[i])
+                if (Mathf.Abs(child.position.x - OldAIsnake[i].x) < 0.001 && Mathf.Abs(child.position.y - OldAIsnake[i].y) < 0.001)
+                //if(child.position == OldAIsnake[i])
                 {
                     gridGenerator.setAIGraph((int)(OldAIsnake[i].x - offset), (int)OldAIsnake[i].y, 0);
 
-                    Vector3 nextDirection = OldAIsnake[i - 1] - OldAIsnake[i];
+/*                    Vector3 nextDirection = OldAIsnake[i - 1] - OldAIsnake[i];
                     nextDirection.x = (int)nextDirection.x;
                     nextDirection.y = (int)nextDirection.y;
                     nextDirection.z = (int)nextDirection.z;
-                    //child.Translate(nextDirection);
+                    child.Translate(nextDirection.normalized);
+                    //child.position = child.position + nextDirection;*/
 
-                    child.position = child.position + nextDirection;
-                        
+                    child.position = OldAIsnake[i - 1];
+
                     AIsnake[i] = OldAIsnake[i - 1];
 
                     gridGenerator.setAIGraph((int)(OldAIsnake[i - 1].x - offset), (int)OldAIsnake[i - 1].y, 2);
@@ -250,7 +254,7 @@ public class AI : MonoBehaviour
                 Debug.Log("----------------------------------------------------------------");
                 foreach(var ele in shortestPath)
                 {
-                    Debug.Log(ele);
+                    //Debug.Log(ele);
                 }
      
                 return parent;
