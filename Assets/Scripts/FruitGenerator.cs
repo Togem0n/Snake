@@ -23,20 +23,21 @@ public class FruitGenerator : MonoBehaviour
         AIgraph = gridGenerator.getAIGraph;
 
         GameEvents.current.onFruitGotEaten += GenerateFruit;
+        GameEvents.current.onFruitGotEatenByAI += GenerateFruit;
+
 
         GenerateFruit();
     }
 
     void Update()
     {
-        
+        graph = gridGenerator.getGraph;
+
+        AIgraph = gridGenerator.getAIGraph;
     }
 
     public void GenerateFruit()
     {
-        graph = gridGenerator.getGraph;
-
-        AIgraph = gridGenerator.getAIGraph;
 
         int count = -1;
         for (int i = 0; i < graph.GetLength(0); i++)
@@ -45,7 +46,6 @@ public class FruitGenerator : MonoBehaviour
             {
                 if (graph[i, j] == 0 && AIgraph[i, j] == 0)
                 {
-                    //Debug.DrawLine(new Vector3(i, j, 0), new Vector3(0, 0, 0));
                     count++;
                     availablePosition.Add(new Vector3(i, j, 0));
                 }
@@ -53,7 +53,7 @@ public class FruitGenerator : MonoBehaviour
         }
         int num = Random.Range(0, count);
         Instantiate(fruit, availablePosition[num], Quaternion.identity);
-        Instantiate(AIfruit, new Vector3(availablePosition[num].x + 51, availablePosition[num].y, 0), Quaternion.identity);
+        Instantiate(AIfruit, new Vector3(availablePosition[num].x + AIgraph.GetLength(0) + 1, availablePosition[num].y, 0), Quaternion.identity);
 
         ai.IsNewFruit = true;
     }

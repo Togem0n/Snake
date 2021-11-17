@@ -23,7 +23,6 @@ public class GridGenerator : MonoBehaviour
     {
         grid.ReadFile();
         graph = grid.getGraph;
-
         AIgraph = grid.getAIGraph;
 
         for (int i = 0; i < graph.GetLength(0); i++)
@@ -35,14 +34,17 @@ public class GridGenerator : MonoBehaviour
             }
         }
 
+        Debug.Log(graph.GetLength(0));
+        Debug.Log(graph.GetLength(1));
+
         if (enableAI)
         {
             for (int i = 0; i < AIgraph.GetLength(0); i++)
             {
                 for (int j = 0; j < AIgraph.GetLength(1) - 1; j++)
                 {
-                    if (AIgraph[i, j] == 0) Instantiate(road, new Vector2(i + 51, j), Quaternion.identity);
-                    if (AIgraph[i, j] == 1) Instantiate(wall, new Vector2(i + 51, j), Quaternion.identity);
+                    if (AIgraph[i, j] == 0) Instantiate(road, new Vector2(i + AIgraph.GetLength(0) + 1, j), Quaternion.identity);
+                    if (AIgraph[i, j] == 1) Instantiate(wall, new Vector2(i + AIgraph.GetLength(0) + 1, j), Quaternion.identity);
                 }
             }
         }

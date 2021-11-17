@@ -31,14 +31,21 @@ public class AI : MonoBehaviour
     private float nextSearchTime = 0.05f;
     private float nextSearchCounter = 0.05f;
 
+    private Vector3 nextAstarStartPos;
+
    // [SerializeField] private TMPro text;
 
     int count = 0;
     void Start()
     {
         AIgraph = gridGenerator.getAIGraph;
-        offset = 51;
+        offset = AIgraph.GetLength(0) + 1;
         interval = AIInterval;
+
+        Debug.Log(offset);
+
+        transform.SetPositionAndRotation(new Vector3(AIgraph.GetLength(0) / 2 + offset, (AIgraph.GetLength(1) - 1) / 2, 0), Quaternion.identity);
+
         foreach (Transform child in transform)
         {
             AIsnake.Add(new Vector3((int)child.position.x, (int)child.position.y, 0));
@@ -47,7 +54,7 @@ public class AI : MonoBehaviour
             gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
         }
 
-        GameEvents.current.onFruitGotEaten += GrowTail;
+        GameEvents.current.onFruitGotEatenByAI += GrowTail;
 
         Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
     }
@@ -71,7 +78,7 @@ public class AI : MonoBehaviour
                 }
             }
         }
-
+        //SyncPosition();
         if (isNewFruit)
         {
 
@@ -81,7 +88,9 @@ public class AI : MonoBehaviour
             }
             else
             {
+                Debug.Log("head position is:" + transform.Find("Head").position.ToString());
                 Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
+
                 isNewFruit = false;
                 nextSearchCounter = nextSearchTime;
             }
@@ -107,7 +116,7 @@ public class AI : MonoBehaviour
                 }
             }
         }
-        Debug.Log(cnt);
+        //Debug.Log(cnt);
 
         foreach (Transform child in transform)
         {
@@ -124,7 +133,8 @@ public class AI : MonoBehaviour
             if(Mathf.Abs(child.position.x - OldAIsnake[0].x) < 0.001 && Mathf.Abs(child.position.y - OldAIsnake[0].y) < 0.001)
             //if(child.position == OldAIsnake[0])
             {
-                Debug.Log(OldAIsnake[0] + child.name); 
+                //if (shortestPath.Count == 1) nextAstarStartPos = shortestPath[0];
+
                 Vector3 des = shortestPath[shortestPath.Count - 1];
                 des.x = (int)des.x + offset;
                 des.y = (int)des.y;
@@ -133,34 +143,28 @@ public class AI : MonoBehaviour
 
                 gridGenerator.setAIGraph((int)(AIsnake[0].x - offset), (int)AIsnake[0].y, 0);
 
-                nextDirection.x = (int)nextDirection.x;
-                nextDirection.y = (int)nextDirection.y;
-                nextDirection.z = (int)nextDirection.z;
 
-                child.Translate(nextDirection.normalized);
-                //child.position = child.position + nextDirection;
-                des.x = (int)des.x;
-                des.y = (int)des.y;
-                des.z = (int)des.z;
+                nextDirection.x = Mathf.RoundToInt(nextDirection.x);
+                nextDirection.y = Mathf.RoundToInt(nextDirection.y);
+                nextDirection.z = Mathf.RoundToInt(nextDirection.z);
+
+                child.Translate(nextDirection);
+
+                des.x = Mathf.RoundToInt(des.x);
+                des.y = Mathf.RoundToInt(des.y);
+                des.z = Mathf.RoundToInt(des.z);
 
                 AIsnake[0] = des;
 
                 gridGenerator.setAIGraph((int)(AIsnake[0].x - offset), (int)AIsnake[0].y, 2);
             }
-            //問題是 迭代時不保證順序的其實
+
             for(int i = 1; i < AIsnake.Count; i++)
             {
                 if (Mathf.Abs(child.position.x - OldAIsnake[i].x) < 0.001 && Mathf.Abs(child.position.y - OldAIsnake[i].y) < 0.001)
                 //if(child.position == OldAIsnake[i])
                 {
                     gridGenerator.setAIGraph((int)(OldAIsnake[i].x - offset), (int)OldAIsnake[i].y, 0);
-
-/*                    Vector3 nextDirection = OldAIsnake[i - 1] - OldAIsnake[i];
-                    nextDirection.x = (int)nextDirection.x;
-                    nextDirection.y = (int)nextDirection.y;
-                    nextDirection.z = (int)nextDirection.z;
-                    child.Translate(nextDirection.normalized);
-                    //child.position = child.position + nextDirection;*/
 
                     child.position = OldAIsnake[i - 1];
 
@@ -175,29 +179,20 @@ public class AI : MonoBehaviour
         {
             OldAIsnake[i] = AIsnake[i];
         }
-
-        if(shortestPath.Count == 0)
-        {
-            //GrowTail();
-        }
-
         //SyncPosition();
     }
 
     private Dictionary<Vector3, Vector3> Astar(Vector3 start, Vector3 end)
     {
         shortestPath.Clear();
-        /*        Debug.Log(isNewFruit);
-                Debug.Log(shortestPath.Count);*/
 
-        start.x = (int)start.x;
-        start.y = (int)start.y;
-        start.z = (int)start.z;
+        start.x = Mathf.RoundToInt(start.x);
+        start.y = Mathf.RoundToInt(start.y);
+        start.z = Mathf.RoundToInt(start.z);
 
-
-        end.x = (int)end.x;
-        end.y = (int)end.y;
-        end.z = (int)end.z;
+        end.x = Mathf.RoundToInt(end.x);
+        end.y = Mathf.RoundToInt(end.y);
+        end.z = Mathf.RoundToInt(end.z);
 
         AIgraph = gridGenerator.getAIGraph;
 
@@ -211,13 +206,6 @@ public class AI : MonoBehaviour
         Dictionary<Vector3, float> g = new Dictionary<Vector3, float>();
         Dictionary<Vector3, float> h = new Dictionary<Vector3, float>();
         Dictionary<Vector3, float> f = new Dictionary<Vector3, float>();
-
-        openList.Clear();
-        closeList.Clear();
-        parent.Clear();
-        g.Clear();
-        h.Clear();
-        f.Clear();
 
         for (int i = 0; i < AIgraph.GetLength(0); i++)
         {
@@ -259,12 +247,15 @@ public class AI : MonoBehaviour
                     shortestDis++;
                 }
 
-/*                Debug.Log("----------------------------------------------------------------");
-                foreach(var ele in shortestPath)
+                Debug.Log("----------------------------------------------------------------");
+                Debug.Log("start:" + start.ToString() + "to " + end.ToString());
+                foreach (var ele in shortestPath)
                 {
-                    //Debug.Log(ele);
-                }*/
-     
+                    Debug.Log(ele);
+                }
+                nextAstarStartPos = shortestPath[0];
+                nextAstarStartPos.x += offset;
+                Debug.Log("next start:" + nextAstarStartPos.ToString());
                 return parent;
             }
 
@@ -379,7 +370,6 @@ public class AI : MonoBehaviour
             }
         }
 
-        //Debug.Log(start.ToString() + ";" + end.ToString());
         return parent;
     }
 
@@ -396,8 +386,6 @@ public class AI : MonoBehaviour
 
         AIsnake.Add(growPosition);
         OldAIsnake.Add(growPosition);
-        Debug.Log(growDirection);
-        Debug.Log(growPosition);
         gridGenerator.setAIGraph((int)growPosition.x - offset, (int)growPosition.y, 2);
         Instantiate(tail, growPosition, Quaternion.identity, transform);
     }

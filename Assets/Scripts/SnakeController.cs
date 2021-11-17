@@ -44,6 +44,8 @@ public class SnakeController : MonoBehaviour
 
         boxCollider2D = GetComponent<BoxCollider2D>();
 
+        transform.SetPositionAndRotation(new Vector3(graph.GetLength(0) / 2, (graph.GetLength(1) - 1) / 2, 0), Quaternion.identity);
+
         foreach (Transform child in transform)
         {
             snake.Push(new Vector3(child.position.x, child.position.y, 0));
@@ -152,11 +154,18 @@ public class SnakeController : MonoBehaviour
             {
                 gridGenerator.setGraph((int)child.position.x, (int)child.position.y, 0);
                 Vector3 nextPos = child.position + nextDirection;
-                if (graph[(int)nextPos.x, (int)nextPos.y] == 0)
+                if (graph[(int)nextPos.x, (int)nextPos.y] == 0 && nextPos.x >= 0 && nextPos.x < graph.GetLength(0) && nextPos.y >= 0 && nextPos.y < graph.GetLength(1) - 1)
+                {
                     gridGenerator.setGraph((int)nextPos.x, (int)nextPos.y, 2);
+                    child.Translate(nextDirection);
+                }
                 else
+                {
                     isDead = true;
-                child.Translate(nextDirection);
+                    return;
+                }
+                    
+                //child.Translate(nextDirection);
             }
         }
         snake.getCurr.value = snake.getCurr.value + nextDirection;

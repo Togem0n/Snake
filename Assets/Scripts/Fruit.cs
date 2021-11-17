@@ -10,6 +10,8 @@ public class Fruit : MonoBehaviour
     void Start()
     {
         GameEvents.current.onFruitGotEaten += DestoryMyself;
+        GameEvents.current.onFruitGotEatenByAI += DestoryMyself;
+
         boxCollider2D = GetComponent<BoxCollider2D>();
     }
 
@@ -30,6 +32,8 @@ public class Fruit : MonoBehaviour
     private void DestoryMyself()
     {
         GameEvents.current.onFruitGotEaten -= DestoryMyself;
+        GameEvents.current.onFruitGotEatenByAI -= DestoryMyself;
+
         Destroy(transform.gameObject);
     }
 
@@ -38,6 +42,11 @@ public class Fruit : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
             GameEvents.current.FruitGotEaten();
+        }
+
+        if (collision.gameObject.tag == "AI")
+        {
+            GameEvents.current.FruitGotEatenByAI();
         }
     }
 

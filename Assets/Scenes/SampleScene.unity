@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridGenerator: {fileID: 1715440175}
-  AIInterval: 0.05
+  AIInterval: 0.15
   tail: {fileID: 5678174793261361363, guid: 1e72502eba1f5154ab1692c4d28abac9, type: 3}
   snakeController: {fileID: 1975237615}
 --- !u!4 &122535162
@@ -186,7 +186,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 122535159}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 75, y: 25, z: 0}
+  m_LocalPosition: {x: 46, y: 15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 921504956}
@@ -625,8 +625,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1715440175}
     - target: {fileID: 3414282558705123676, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
+      propertyPath: boostlInterval
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3414282558705123676, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: normalInterval
-      value: 1000
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123678, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: m_RootOrder
@@ -634,11 +638,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123678, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 25
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123678, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 25
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123678, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: m_LocalPosition.z
