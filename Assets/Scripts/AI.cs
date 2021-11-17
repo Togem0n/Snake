@@ -21,7 +21,6 @@ public class AI : MonoBehaviour
 
     public List<Vector3> getAIsnake { get { return AIsnake; } }
 
-
     private List<Vector3> shortestPath = new List<Vector3>();
     private int shortestDis;
     private bool isNewFruit;
@@ -76,6 +75,12 @@ public class AI : MonoBehaviour
                     interval = AIInterval;
                     ChangePosition();
                 }
+            }else if(shortestPath.Count == 0)
+            {
+                foreach (Transform child in transform)
+                {
+                    gridGenerator.setAIGraph((int)child.position.x - offset, (int)child.position.y, 2);
+                }
             }
         }
         //SyncPosition();
@@ -88,7 +93,7 @@ public class AI : MonoBehaviour
             }
             else
             {
-                Debug.Log("head position is:" + transform.Find("Head").position.ToString());
+                //Debug.Log("head position is:" + transform.Find("Head").position.ToString());
                 Astar(transform.Find("Head").position, GameObject.FindWithTag("AIFruit").transform.position);
 
                 isNewFruit = false;
@@ -186,6 +191,11 @@ public class AI : MonoBehaviour
     {
         shortestPath.Clear();
 
+        AIgraph = gridGenerator.getAIGraph;
+
+        start.x -= offset;
+        end.x -= offset;
+
         start.x = Mathf.RoundToInt(start.x);
         start.y = Mathf.RoundToInt(start.y);
         start.z = Mathf.RoundToInt(start.z);
@@ -193,11 +203,6 @@ public class AI : MonoBehaviour
         end.x = Mathf.RoundToInt(end.x);
         end.y = Mathf.RoundToInt(end.y);
         end.z = Mathf.RoundToInt(end.z);
-
-        AIgraph = gridGenerator.getAIGraph;
-
-        start.x -= offset;
-        end.x -= offset;
 
         List<Vector3> openList = new List<Vector3>();
         List<Vector3> closeList = new List<Vector3>();
@@ -247,15 +252,15 @@ public class AI : MonoBehaviour
                     shortestDis++;
                 }
 
-                Debug.Log("----------------------------------------------------------------");
-                Debug.Log("start:" + start.ToString() + "to " + end.ToString());
+                //Debug.Log("----------------------------------------------------------------");
+                //Debug.Log("start:" + start.ToString() + "to " + end.ToString());
                 foreach (var ele in shortestPath)
                 {
-                    Debug.Log(ele);
+                    //Debug.Log(ele);
                 }
                 nextAstarStartPos = shortestPath[0];
                 nextAstarStartPos.x += offset;
-                Debug.Log("next start:" + nextAstarStartPos.ToString());
+                //Debug.Log("next start:" + nextAstarStartPos.ToString());
                 return parent;
             }
 

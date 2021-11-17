@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Fruit
   - AIFruit
+  - AI
   layers:
   - Default
   - TransparentFX

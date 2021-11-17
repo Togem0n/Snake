@@ -51,6 +51,7 @@ public class FruitGenerator : MonoBehaviour
                 }
             }
         }
+        Debug.Log(count);
         int num = Random.Range(0, count);
         Instantiate(fruit, availablePosition[num], Quaternion.identity);
         Instantiate(AIfruit, new Vector3(availablePosition[num].x + AIgraph.GetLength(0) + 1, availablePosition[num].y, 0), Quaternion.identity);

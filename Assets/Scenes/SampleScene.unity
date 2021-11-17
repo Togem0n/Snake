@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridGenerator: {fileID: 1715440175}
-  AIInterval: 0.15
+  AIInterval: 0.02
   tail: {fileID: 5678174793261361363, guid: 1e72502eba1f5154ab1692c4d28abac9, type: 3}
   snakeController: {fileID: 1975237615}
 --- !u!4 &122535162
@@ -290,7 +290,7 @@ GameObject:
   - component: {fileID: 921504957}
   m_Layer: 0
   m_Name: Head
-  m_TagString: Player
+  m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -630,7 +630,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123676, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: normalInterval
-      value: 0.15
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3414282558705123678, guid: 499a6d6efbc034d4ebd842c27d192758, type: 3}
       propertyPath: m_RootOrder
